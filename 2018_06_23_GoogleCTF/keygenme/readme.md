@@ -109,6 +109,7 @@ x
 Now we can dive into some static reversing. 
 
 Opening it up in IDA we immediately see some form of decryption loop. `sub_400189` mmaps a 65KB region of RWX memory, then we can see the code copies 17576 bytes from address `0x6001BC` in the .data section, to the mmapped memory, after which the mmapped memory is xored with the key `0x1122334455667788`.
+
 ![Decryption loop in IDA](/2018_06_23_GoogleCTF/keygenme/images/main_1.png)
 
 I whipped up a quick IDA script to perform this xor statically so I could continue my analysis.
@@ -128,6 +129,7 @@ Message("[*] XOR done :)\n");
 Browsing to `0x6001BC` and marking it as code we can now see the decrypted code. 
 
 Most of this code looks like it has been handwritten and there are various self-modifying tricks to throw us off. For example the following piece of code actually calls `ptrace` and not `exit_group`, by changing the syscall number of its own code.
+
 ![Self modification with ptrace](/2018_06_23_GoogleCTF/keygenme/images/main_2.png)
 
 
@@ -409,6 +411,7 @@ At this point I spent a while trying to dump the whole patched binary from the k
 Now we finally had the complete second stage binary and could see what it was doing. 
 
 Some of the functions initially looked pretty heavy.
+
 ![Decryption loop in IDA](/2018_06_23_GoogleCTF/keygenme/images/second_1.png)
 
 
