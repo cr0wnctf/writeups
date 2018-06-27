@@ -389,7 +389,7 @@ CTF{Moar_Randomz_Moar_Mitigatez!}
 
 After solving this, a teammate told me about pwntools' [DynELF](http://docs.pwntools.com/en/stable/dynelf.html) functionality.
 It effectively automates my "dump libc to find system()" process, except much
-more efficiently because it doesn't have to dump the entirely binary.
+more efficiently because it doesn't have to dump the entire binary.
 
 Using it is as simple as this:
 
