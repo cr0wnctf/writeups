@@ -200,7 +200,7 @@ After a quick inspection of the disassembled code, it would appear that this
 is the reference to the "root" file node, which is set up in one of the `init_array` functions.
 Using this reference to the root file node, we can read and write the GOT entries.
 
-# Implementation
+## Implementation
 Here's my final exploit implementation: (Cleaned up a lot since the CTF...)
 
 ```python
