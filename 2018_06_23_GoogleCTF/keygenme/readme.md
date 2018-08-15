@@ -290,7 +290,7 @@ int init_module()
         syscall_table[__NR_process_vm_readv] = &new_readv;
         syscall_table[__NR_process_vm_writev] = &new_writev;
 
-        // Disable read protect
+        // Enable write protect
         write_cr0 (read_cr0 () | 0x10000);
 
 
