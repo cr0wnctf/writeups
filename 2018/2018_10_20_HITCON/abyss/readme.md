@@ -31,7 +31,7 @@ Next I noticed that both `swap` and `rot` move items around on the evaluation st
        ^-- swapped --^
 ```
 
-![Evaluation stack .bss layout](/2018/2018_10_20_HITCON/images/eval_stack_ptr.png)
+![Evaluation stack .bss layout](/2018/2018_10_20_HITCON/abyss/images/eval_stack_ptr.png)
 
 Thankfully `user.elf` was partial RELRO, meaning we could overwrite a GOT entry with the above technique. The plan was to write a GOT entry with the address of our shellcode (which we put at the end of the input buffer in `.bss`). However, the binary is PIE and there were no leaks, so we had to do some gymnastics with the GOT entries to get a pointer to our shellcode. I did this by adding an offset to a known pointer (unresolved `write` entry which pointed into the PLT) and then swapping DWORDs along until I swapped the low DWORD of the unreslved `printf` entry with our adjusted low DWORD, to form a pointer which pointed to our shellcode. We then triggered `printf` with the  `writed` command (`.`), which jumped to our shellcode.
 
@@ -102,11 +102,11 @@ Now we had shellcode execution in the `user.elf` we needed to get the contents o
 
 The kernel communicates with the hypervisor via writing to I/O ports. The exact I/O port number written to determines which function to call in the hypervisor. These port values were defined as `0x8000 + syscall number`. So by writing to port `0x8002` in the VM with `out dx, eax`, where `eax` points to the array of arguments for the syscall, the hypervisor will perform this `open` operation for us and return the result (which we can read with `in eax, dx`). 
 
-![Hypervisor run loop](/2018/2018_10_20_HITCON/images/run_loop.png)
+![Hypervisor run loop](/2018/2018_10_20_HITCON/abyss/images/run_loop.png)
 
 My teammate then suggested that maybe we could just write to the I/O ports directly using the `in` and `out` instructions, and therefore completely bypass the kernel and communicate with the hypervisor directly. To my surprise we actually had the required privileges to write to these I/O ports and were able to trigger the handlers in the hypervisor. So now all we had to do was get the hypervisor to do the opening of `flag2` for us, and then we could read and write out the contents of the file as before.
 
-![Hypervisor dispatch function](/2018/2018_10_20_HITCON/images/handle_hypercall.png)
+![Hypervisor dispatch function](/2018/2018_10_20_HITCON/abyss/images/handle_hypercall.png)
 
 The issue here is that the hypervisor expects pointers into kernel memory for hypercall arguments, therefore blindly passing pointers from the `user.elf` address space didn't make sense to the hypervisor, and promptly crashed it.
 
