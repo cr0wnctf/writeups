@@ -26,7 +26,7 @@ The kernel then runs `ld.so.2 ./user.elf` which loads `user.elf` and executes it
 
 Next I noticed that both `swap` and `rot` move items around on the evaluation stack without checking the bounds of the evaluation stack pointer. Conveniently the eval stack pointer is positioned directly before the first item in the evaluation stack array. Therefore if the eval stack pointer was at `item1`, you could use the swap operator (`\`) to swap the top two stack items, i.e. the eval stack pointer with `item0`, which you control. Now the evaluation stack is actually pointing to wherever you want it to and by pushing values to it you can write at your desired location.
 ```
-[eval stack ptr] [ [item0] [item1] ... ]
+[eval stack ptr] [ [item0] [empty] ... ]
                              ^-- eval stack ptr
        ^-- swapped --^
 ```
