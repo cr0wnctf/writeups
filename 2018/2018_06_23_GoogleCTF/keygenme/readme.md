@@ -1,5 +1,5 @@
 # GoogleCTF 2018 - keygenme - 249pts
-![Challenge description](/2018_06_23_GoogleCTF/keygenme/images/chall.png)
+![Challenge description](/2018/2018_06_23_GoogleCTF/keygenme/images/chall.png)
 
 # TL;DR
 For this challenge we were provided with a single file called `main`. The binary decrypts itself and then forks, the child decrypts the second stage and executes it, the parent rewrites the child code on the fly and the child performs verification of the flag with a modified MD5 and a transformation function.
@@ -110,7 +110,7 @@ Now we can dive into some static reversing.
 
 Opening it up in IDA we immediately see some form of decryption loop. `sub_400189` mmaps a 65KB region of RWX memory, then we can see the code copies 17576 bytes from address `0x6001BC` in the .data section, to the mmapped memory, after which the mmapped memory is xored with the key `0x1122334455667788`.
 
-![Decryption loop in IDA](/2018_06_23_GoogleCTF/keygenme/images/main_1.png)
+![Decryption loop in IDA](/2018/2018_06_23_GoogleCTF/keygenme/images/main_1.png)
 
 I whipped up a quick IDA script to perform this xor statically so I could continue my analysis.
 
@@ -130,7 +130,7 @@ Browsing to `0x6001BC` and marking it as code we can now see the decrypted code.
 
 Most of this code looks like it has been handwritten and there are various self-modifying tricks to throw us off. For example the following piece of code actually calls `ptrace` and not `exit_group`, by changing the syscall number of its own code.
 
-![Self modification with ptrace](/2018_06_23_GoogleCTF/keygenme/images/main_2.png)
+![Self modification with ptrace](/2018/2018_06_23_GoogleCTF/keygenme/images/main_2.png)
 
 
 Continuing to read through and following the (somewhat obfuscated) control flow we can see the aforementioned behaviour of setting up seccomp rules, creating and writing to a memfd, and eventually executing it. The two reads performed are passed to the `execve`d process as `argv[0]` and `argv[1]`. It appears that `sub_603EEE` does the decryption of the ELF file, however its control flow was too difficult to follow, so I just stepped over it when debugging and took it as a magic black box which decrypted the ELF. 
@@ -412,7 +412,7 @@ Now we finally had the complete second stage binary and could see what it was do
 
 Some of the functions initially looked pretty heavy.
 
-![Decryption loop in IDA](/2018_06_23_GoogleCTF/keygenme/images/second_1.png)
+![Decryption loop in IDA](/2018/2018_06_23_GoogleCTF/keygenme/images/second_1.png)
 
 
 However after spotting some MD5 constants it soon became clear that all the bad looking functions were actually MD5, which was nice.
