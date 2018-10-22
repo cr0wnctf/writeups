@@ -24,9 +24,9 @@ The kernel then runs `ld.so.2 ./user.elf` which loads `user.elf` and executes it
 # Part 1 - I - 230pts
  The first thing we needed to do was find a vulnerability in `user.elf`. Looking over the code I soon noticed an off-by-one null byte overflow with the `scanf` which reads the input. The `scanf` uses the format string `%1024s`, which reads a string up to 1024 bytes long, and then a null byte is added. The input buffer was only 1024 bytes long, meaning the null byte overflowed into a loop index, however this loop index is initialised to 0 before use anyway, so this was useless.
 
-Next I noticed that both `swap` and `rot` move items around on the evaluation stack without checking the bounds of the evaluation stack pointer. Conveniently the eval stack pointer is positioned directly before the first item in the evaluation stack array. Therefore if the eval stack pointer was at `item1`, you could use the swap operator (`\`) to swap the top two stack items, i.e. the eval stack pointer with `item0`, which you control. Now the evaluation stack is actually pointing to wherever you want it to and by pushing values to it you can write at your desired location.
+Next I noticed that both `swap` and `rot` move items around on the evaluation stack without checking the bounds of the evaluation stack pointer. Conveniently the eval stack pointer is positioned directly before the first item in the evaluation stack array. Therefore if the eval stack pointer was at `empty1`, you could use the swap operator (`\`) to swap the top two stack items, i.e. the eval stack pointer with `item0`, which you control. Now the evaluation stack is actually pointing to wherever you want it to and by pushing values to it you can write at your desired location.
 ```
-[eval stack ptr] [ [item0] [empty] ... ]
+[eval stack ptr] [ [item0] [empty1] ... ]
                              ^-- eval stack ptr
        ^-- swapped --^
 ```
