@@ -1,6 +1,6 @@
  # WPICTF 2019 - breakingin - pwn 500
 
-For this challenge we were given SSH credentials and told that there was an SSH server listening on localhost on `breakingin.wpictf.xyz`, but the firewall was blocking external access to this server. However there was a 'strange' service listening on port 31337.
+For this challenge we were given SSH credentials and told that there was an SSH server listening on localhost on `breakingin.wpictf.xyz`, but the firewall was blocking external access to this server. However there was a 'weird' service listening on port 31337.
 
 ![Challenge description](images/breakingin1.png)
 
@@ -10,8 +10,7 @@ Connecting to this port with netcat showed that this was a service which would s
 
 ## Instruction Structure
 It's a classic RISC style instruction set, with all instructions taking up 16 bytes, in the following form:
-`[op] [A] [B] [C]`
-Each part consists of 4 bytes, `op` is the opcode, and `A`, `B` are the operands. `C` is the destination offset. So the operation performed looks like `mem[C] = mem[A] op mem[B]`.
+`[op] [A] [B] [C]`. Each part consists of 4 bytes, `op` is the opcode, and `A`, `B` are the operands. `C` is the destination offset. So the operation performed looks like `mem[C] = mem[A] op mem[B]`.
 
 ## Hidden Opcode
 It's clear that with the standard RoboarchNG instructions we wouldn't be able to do anything interesting aside from arithmetic operations, because there is no way to interact with the system. Interestingly when you connect to the service it says that there's a "special secret op" added. I immediately thought that this must be a syscall, which would enable us to do some interesting things like spawn a shell or read a file. Now we just had to track down this hidden opcode. The issue here was that the opcode is 4 bytes, which makes a possible 4 billion (2^32) opcodes. 
